@@ -4,33 +4,47 @@ import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'residence_list_screen.dart';
 import 'booking_list_screen.dart';
+import 'activities_screen.dart';
+import 'provider_dashboard_screen.dart';
+import '../utils/constants.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _showLogoutDialog(context),
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final user = authProvider.user;
+
+        if (user == null) {
+          return const Center(
+            child: Text('No user data available'),
+          );
+        }
+
+        // Show provider dashboard for users with provider role
+        if (user.role == AppConstants.providerRole) {
+          return const ProviderDashboardScreen();
+        }
+
+        // Show regular home screen for other users
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Home'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () => _showLogoutDialog(context),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
-          final user = authProvider.user;
-
-          if (user == null) {
-            return const Center(
-              child: Text('No user data available'),
-            );
-          }
-
-          return Padding(
+          body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
@@ -90,7 +104,12 @@ class HomeScreen extends StatelessWidget {
                           'Activities',
                           Icons.local_activity,
                           Colors.green,
-                          () => _showComingSoon(context, 'Activities'),
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ActivitiesScreen(),
+                            ),
+                          ),
                         ),
                         _buildActionCard(
                           context,
@@ -117,9 +136,9 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 

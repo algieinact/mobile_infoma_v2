@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/residence_provider.dart';
 import 'providers/booking_provider.dart';
+import 'providers/activity_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/residence_list_screen.dart';
+import 'screens/auth_wrapper.dart';
 import 'utils/constants.dart';
 
 void main() {
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ResidenceProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
+        ChangeNotifierProvider(create: (_) => ActivityProvider()),
       ],
       child: MaterialApp(
         title: AppConstants.appName,
@@ -52,7 +55,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const SplashScreen(),
+        home: const AuthWrapper(),
         routes: {'/residences': (context) => const ResidenceListScreen()},
         debugShowCheckedModeBanner: false,
       ),

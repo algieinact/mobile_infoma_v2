@@ -4,8 +4,15 @@ import '../screens/residence_detail_screen.dart';
 
 class ResidenceCard extends StatelessWidget {
   final Residence residence;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const ResidenceCard({Key? key, required this.residence}) : super(key: key);
+  const ResidenceCard({
+    Key? key,
+    required this.residence,
+    required this.onEdit,
+    required this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +35,17 @@ class ResidenceCard extends StatelessWidget {
           children: [
             // Residence Image
             if (residence.images.isNotEmpty)
-              AspectRatio(
-                aspectRatio: 16 / 9,
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(4)),
                 child: Image.network(
                   residence.images.first,
+                  height: 200,
+                  width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
+                      height: 200,
                       color: Colors.grey[300],
                       child: const Icon(
                         Icons.image_not_supported,
@@ -76,48 +87,6 @@ class ResidenceCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Type and Gender
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          residence.type.toUpperCase(),
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          residence.genderType.toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
                   // Address
                   Row(
                     children: [
@@ -129,11 +98,11 @@ class ResidenceCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '${residence.address}, ${residence.city}',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.grey[600],
-                                  ),
+                          residence.address,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -142,20 +111,21 @@ class ResidenceCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Price and Available Rooms
+                  // Price and Capacity
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Rp ${residence.price.toStringAsFixed(0)}/${residence.pricePeriod}',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        '\$${residence.price.toStringAsFixed(2)}/month',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       Text(
-                        '${residence.availableRooms}/${residence.totalRooms} kamar tersedia',
+                        '${residence.totalRooms} persons',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.grey[600],
                             ),
@@ -164,13 +134,13 @@ class ResidenceCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Facilities
+                  // Amenities
                   Wrap(
                     spacing: 8,
-                    children: residence.facilities.take(3).map((facility) {
+                    children: residence.facilities.take(3).map((amenity) {
                       return Chip(
                         label: Text(
-                          facility,
+                          amenity,
                           style: const TextStyle(fontSize: 12),
                         ),
                         backgroundColor: Colors.grey[200],
@@ -178,6 +148,27 @@ class ResidenceCard extends StatelessWidget {
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       );
                     }).toList(),
+                  ),
+
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: onEdit,
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit'),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete),
+                        label: const Text('Delete'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

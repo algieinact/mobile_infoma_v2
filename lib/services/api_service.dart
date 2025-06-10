@@ -110,6 +110,12 @@ class ApiService {
     required String password,
     required String passwordConfirmation,
     String? role,
+    String? phone,
+    String? university,
+    String? major,
+    int? graduationYear,
+    String? gender,
+    String? birthDate,
   }) async {
     try {
       final response = await http.post(
@@ -121,6 +127,12 @@ class ApiService {
           'password': password,
           'password_confirmation': passwordConfirmation,
           if (role != null) 'role': role,
+          if (phone != null) 'phone': phone,
+          if (university != null) 'university': university,
+          if (major != null) 'major': major,
+          if (graduationYear != null) 'graduation_year': graduationYear,
+          if (gender != null) 'gender': gender,
+          if (birthDate != null) 'birth_date': birthDate,
         }),
       );
 

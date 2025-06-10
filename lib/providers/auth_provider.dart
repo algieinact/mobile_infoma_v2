@@ -52,6 +52,12 @@ class AuthProvider with ChangeNotifier {
     required String password,
     required String passwordConfirmation,
     String? role,
+    String? phone,
+    String? university,
+    String? major,
+    int? graduationYear,
+    String? gender,
+    String? birthDate,
   }) async {
     try {
       _setLoading(true);
@@ -63,6 +69,12 @@ class AuthProvider with ChangeNotifier {
         password: password,
         passwordConfirmation: passwordConfirmation,
         role: role,
+        phone: phone,
+        university: university,
+        major: major,
+        graduationYear: graduationYear,
+        gender: gender,
+        birthDate: birthDate,
       );
 
       if (response.success && response.user != null) {

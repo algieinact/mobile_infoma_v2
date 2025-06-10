@@ -16,37 +16,40 @@ class ResidenceProvider with ChangeNotifier {
 
   // Load all residences
   Future<void> loadResidences() async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
+    _setLoading(true);
+    _setError('');
 
     try {
-      print('=== Residence Provider: Loading Residences ===');
-      _residences = await ResidenceService.getResidences();
-      print('Loaded ${_residences.length} residences');
-      _filteredResidences = _residences;
-      print('Filtered residences count: ${_filteredResidences.length}');
-    } catch (e) {
-      print('=== Residence Provider Error ===');
-      print('Error Type: ${e.runtimeType}');
-      print('Error Message: $e');
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
+      final residences = await ResidenceService.getResidences();
+      _residences = residences;
+      _filteredResidences = residences;
       notifyListeners();
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
     }
   }
 
   // Search residences
-  Future<void> searchResidences(String query) async {
+  void searchResidences(String query) {
     if (query.isEmpty) {
       _filteredResidences = _residences;
     } else {
-      try {
-        _filteredResidences = await ResidenceService.searchResidences(query);
-      } catch (e) {
-        _error = e.toString();
-      }
+      _filteredResidences = _residences.where((residence) {
+        final name = residence.title.toLowerCase();
+        final description = residence.description.toLowerCase();
+        final address = residence.address.toLowerCase();
+        final city = residence.city.toLowerCase();
+        final province = residence.province.toLowerCase();
+        final searchQuery = query.toLowerCase();
+
+        return name.contains(searchQuery) ||
+            description.contains(searchQuery) ||
+            address.contains(searchQuery) ||
+            city.contains(searchQuery) ||
+            province.contains(searchQuery);
+      }).toList();
     }
     notifyListeners();
   }
@@ -91,31 +94,32 @@ class ResidenceProvider with ChangeNotifier {
   }
 
   // Add new residence
-  Future<void> addResidence(Map<String, dynamic> residenceData) async {
+  Future<void> createResidence(Map<String, dynamic> residenceData) async {
+    _setLoading(true);
+    _setError('');
+
     try {
-      final newResidence = await ResidenceService.createResidence(
-        residenceData,
-      );
-      _residences.add(newResidence);
+      final residence = await ResidenceService.createResidence(residenceData);
+      _residences.add(residence);
       _filteredResidences = _residences;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
-      notifyListeners();
+      _setError(e.toString());
       rethrow;
+    } finally {
+      _setLoading(false);
     }
   }
 
   // Update residence
   Future<void> updateResidence(
-    int id,
-    Map<String, dynamic> residenceData,
-  ) async {
+      int id, Map<String, dynamic> residenceData) async {
+    _setLoading(true);
+    _setError('');
+
     try {
-      final updatedResidence = await ResidenceService.updateResidence(
-        id,
-        residenceData,
-      );
+      final updatedResidence =
+          await ResidenceService.updateResidence(id, residenceData);
       final index = _residences.indexWhere((r) => r.id == id);
       if (index != -1) {
         _residences[index] = updatedResidence;
@@ -123,25 +127,54 @@ class ResidenceProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      _error = e.toString();
-      notifyListeners();
+      _setError(e.toString());
       rethrow;
+    } finally {
+      _setLoading(false);
     }
   }
 
   // Delete residence
   Future<void> deleteResidence(int id) async {
+    _setLoading(true);
+    _setError('');
+
     try {
-      final success = await ResidenceService.deleteResidence(id);
-      if (success) {
-        _residences.removeWhere((r) => r.id == id);
-        _filteredResidences = _residences;
-        notifyListeners();
-      }
-    } catch (e) {
-      _error = e.toString();
+      await ResidenceService.deleteResidence(id);
+      _residences.removeWhere((r) => r.id == id);
+      _filteredResidences = _residences;
       notifyListeners();
+    } catch (e) {
+      _setError(e.toString());
       rethrow;
+    } finally {
+      _setLoading(false);
     }
+  }
+
+  void filterResidences({
+    String? type,
+    String? gender,
+    double? minPrice,
+    double? maxPrice,
+  }) {
+    _filteredResidences = _residences.where((residence) {
+      if (type != null && residence.type != type) return false;
+      if (gender != null && residence.gender != gender) return false;
+      if (minPrice != null && residence.price < minPrice) return false;
+      if (maxPrice != null && residence.price > maxPrice) return false;
+      return true;
+    }).toList();
+    notifyListeners();
+  }
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String error) {
+    _error = error;
+    notifyListeners();
   }
 }
