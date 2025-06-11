@@ -22,6 +22,7 @@ class ResidenceService {
         throw Exception('Failed to load residences');
       }
     } catch (e) {
+      print('Error loading residences: $e');
       throw Exception('Error loading residences: $e');
     }
   }

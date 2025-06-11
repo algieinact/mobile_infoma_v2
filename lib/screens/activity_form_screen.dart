@@ -126,6 +126,7 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
         'requirements': _requirementsController.text,
         'benefits': _benefitsController.text,
         'max_participants': int.parse(_maxParticipantsController.text),
+        'category_id': widget.activity?.categoryId ?? 1,
       };
 
       if (widget.activity == null) {

@@ -34,12 +34,12 @@ class ResidenceCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Residence Image
-            if (residence.images.isNotEmpty)
+            if (residence.images?.isNotEmpty ?? false)
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(4)),
                 child: Image.network(
-                  residence.images.first,
+                  residence.images!.first,
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,

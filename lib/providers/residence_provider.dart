@@ -160,7 +160,7 @@ class ResidenceProvider with ChangeNotifier {
   }) {
     _filteredResidences = _residences.where((residence) {
       if (type != null && residence.type != type) return false;
-      if (gender != null && residence.gender != gender) return false;
+      if (gender != null && residence.genderType != gender) return false;
       if (minPrice != null && residence.price < minPrice) return false;
       if (maxPrice != null && residence.price > maxPrice) return false;
       return true;

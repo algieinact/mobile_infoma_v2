@@ -5,22 +5,27 @@ class Residence {
   final String title;
   final String slug;
   final String description;
+  final String type;
+  final double price;
+  final String pricePeriod;
   final String address;
   final String city;
   final String province;
-  final double price;
+  final double? latitude;
+  final double? longitude;
+  final List<String> facilities;
+  final List<String> rules;
+  final List<String>? images;
   final int totalRooms;
   final int availableRooms;
-  final String type;
-  final String gender;
-  final List<String> facilities;
-  final List<String> images;
+  final String genderType;
   final double rating;
   final int totalReviews;
   final bool isActive;
   final bool isFeatured;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String? availableFrom;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Residence({
     required this.id,
@@ -29,22 +34,27 @@ class Residence {
     required this.title,
     required this.slug,
     required this.description,
+    required this.type,
+    required this.price,
+    required this.pricePeriod,
     required this.address,
     required this.city,
     required this.province,
-    required this.price,
+    this.latitude,
+    this.longitude,
+    required this.facilities,
+    required this.rules,
+    this.images,
     required this.totalRooms,
     required this.availableRooms,
-    required this.type,
-    required this.gender,
-    required this.facilities,
-    required this.images,
+    required this.genderType,
     required this.rating,
     required this.totalReviews,
     required this.isActive,
     required this.isFeatured,
-    this.createdAt,
-    this.updatedAt,
+    this.availableFrom,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory Residence.fromJson(Map<String, dynamic> json) {
@@ -55,30 +65,31 @@ class Residence {
       title: json['title'],
       slug: json['slug'],
       description: json['description'],
-      address: json['address'],
-      city: json['city'],
-      province: json['province'],
+      type: json['type'],
       price: json['price'] is String
           ? double.parse(json['price'])
           : json['price'].toDouble(),
+      pricePeriod: json['price_period'],
+      address: json['address'],
+      city: json['city'],
+      province: json['province'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      facilities: List<String>.from(json['facilities']),
+      rules: List<String>.from(json['rules']),
+      images: json['images'] != null ? List<String>.from(json['images']) : null,
       totalRooms: json['total_rooms'],
       availableRooms: json['available_rooms'],
-      type: json['type'],
-      gender: json['gender'],
-      facilities: List<String>.from(json['facilities']),
-      images: List<String>.from(json['images']),
+      genderType: json['gender_type'],
       rating: json['rating'] is String
           ? double.parse(json['rating'])
           : json['rating'].toDouble(),
       totalReviews: json['total_reviews'],
       isActive: json['is_active'],
       isFeatured: json['is_featured'],
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : null,
+      availableFrom: json['available_from'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 
@@ -90,22 +101,27 @@ class Residence {
       'title': title,
       'slug': slug,
       'description': description,
+      'type': type,
+      'price': price,
+      'price_period': pricePeriod,
       'address': address,
       'city': city,
       'province': province,
-      'price': price,
+      'latitude': latitude,
+      'longitude': longitude,
+      'facilities': facilities,
+      'rules': rules,
+      'images': images,
       'total_rooms': totalRooms,
       'available_rooms': availableRooms,
-      'type': type,
-      'gender': gender,
-      'facilities': facilities,
-      'images': images,
+      'gender_type': genderType,
       'rating': rating,
       'total_reviews': totalReviews,
       'is_active': isActive,
       'is_featured': isFeatured,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'available_from': availableFrom,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_infoma_v2/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/residence_provider.dart';
@@ -56,7 +57,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: const AuthWrapper(),
-        routes: {'/residences': (context) => const ResidenceListScreen()},
+        routes: {
+          '/residences': (context) => const ResidenceListScreen(),
+        },
         debugShowCheckedModeBanner: false,
       ),
     );

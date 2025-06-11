@@ -37,7 +37,7 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
       _priceController.text = widget.residence!.price.toString();
       _capacityController.text = widget.residence!.totalRooms.toString();
       _type = widget.residence!.type;
-      _gender = widget.residence!.gender;
+      _gender = widget.residence!.genderType;
     }
   }
 

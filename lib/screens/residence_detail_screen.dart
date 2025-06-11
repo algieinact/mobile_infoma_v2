@@ -69,9 +69,9 @@ class _ResidenceDetailScreenState extends State<ResidenceDetailScreen> {
                 expandedHeight: 300,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: residence.images.isNotEmpty
+                  background: residence.images?.isNotEmpty ?? false
                       ? Image.network(
-                          residence.images.first,
+                          residence.images!.first,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(

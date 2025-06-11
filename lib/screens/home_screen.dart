@@ -16,6 +16,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isProviderScreen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check user role once when screen is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().user;
+      if (user != null && user.role == AppConstants.providerRole) {
+        setState(() {
+          _isProviderScreen = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
@@ -29,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         // Show provider dashboard for users with provider role
-        if (user.role == AppConstants.providerRole) {
+        if (_isProviderScreen) {
           return const ProviderDashboardScreen();
         }
 
@@ -190,26 +206,58 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await Provider.of<AuthProvider>(context, listen: false)
-                    .logout();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
-              child: const Text('Logout'),
-            ),
-          ],
+        return Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            return AlertDialog(
+              title: const Text('Logout'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Are you sure you want to logout?'),
+                  if (authProvider.isLoading)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: authProvider.isLoading
+                      ? null
+                      : () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: authProvider.isLoading
+                      ? null
+                      : () async {
+                          try {
+                            await authProvider.logout();
+                            if (mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/',
+                                (route) => false,
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Logout failed: ${e.toString()}'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        },
+                  child: const Text('Logout'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
