@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../models/residence_model.dart';
 import '../services/residence_service.dart';
+import '../services/api_service.dart';
+import '../utils/constants.dart';
 
 class ResidenceProvider with ChangeNotifier {
   List<Residence> _residences = [];
@@ -118,6 +120,12 @@ class ResidenceProvider with ChangeNotifier {
     _setError('');
 
     try {
+      // Check if user is admin
+      final user = await ApiService.getCurrentUser();
+      if (user?.role != AppConstants.providerRole) {
+        throw Exception('Only admin can update residences');
+      }
+
       final updatedResidence =
           await ResidenceService.updateResidence(id, residenceData);
       final index = _residences.indexWhere((r) => r.id == id);
@@ -140,6 +148,12 @@ class ResidenceProvider with ChangeNotifier {
     _setError('');
 
     try {
+      // Check if user is admin
+      final user = await ApiService.getCurrentUser();
+      if (user?.role != AppConstants.providerRole) {
+        throw Exception('Only admin can delete residences');
+      }
+
       await ResidenceService.deleteResidence(id);
       _residences.removeWhere((r) => r.id == id);
       _filteredResidences = _residences;

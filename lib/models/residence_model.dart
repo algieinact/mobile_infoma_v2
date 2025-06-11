@@ -58,6 +58,10 @@ class Residence {
   });
 
   factory Residence.fromJson(Map<String, dynamic> json) {
+    if (json['id'] == null) {
+      throw Exception('Residence ID cannot be null');
+    }
+
     return Residence(
       id: json['id'],
       providerId: json['provider_id'],

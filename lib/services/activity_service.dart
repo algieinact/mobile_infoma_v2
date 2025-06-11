@@ -24,10 +24,15 @@ class ActivityService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final Map<String, dynamic> paginatedData = responseData['data'];
-        final List<dynamic> activities = paginatedData['data'] ?? [];
-        print('Found ${activities.length} activities');
-        return activities.map((json) => Activity.fromJson(json)).toList();
+        if (responseData['success'] == true) {
+          final Map<String, dynamic> paginatedData = responseData['data'];
+          final List<dynamic> activities = paginatedData['data'] ?? [];
+          print('Found ${activities.length} activities');
+          return activities.map((json) => Activity.fromJson(json)).toList();
+        } else {
+          throw Exception(
+              'Failed to load activities: ${responseData['message']}');
+        }
       } else {
         print('Failed with status code: ${response.statusCode}');
         throw Exception('Failed to load activities');

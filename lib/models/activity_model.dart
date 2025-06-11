@@ -86,8 +86,16 @@ class Activity {
       startDate: DateTime.parse(json['start_date']),
       endDate: DateTime.parse(json['end_date']),
       registrationDeadline: DateTime.parse(json['registration_deadline']),
-      requirements: json['requirements'],
-      benefits: json['benefits'],
+      requirements: json['requirements'] != null
+          ? (json['requirements'] is List
+              ? json['requirements'].join(', ')
+              : json['requirements'].toString())
+          : null,
+      benefits: json['benefits'] != null
+          ? (json['benefits'] is List
+              ? json['benefits'].join(', ')
+              : json['benefits'].toString())
+          : null,
       images: json['images'] != null ? List<String>.from(json['images']) : null,
       maxParticipants: json['max_participants'],
       currentParticipants: json['current_participants'],

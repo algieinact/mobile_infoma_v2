@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../models/activity_model.dart';
 import '../services/activity_service.dart';
+import '../services/api_service.dart';
+import '../utils/constants.dart';
 
 class ActivityProvider with ChangeNotifier {
   List<Activity> _activities = [];
@@ -48,6 +50,12 @@ class ActivityProvider with ChangeNotifier {
   // Update activity
   Future<void> updateActivity(int id, Map<String, dynamic> activityData) async {
     try {
+      // Check if user is admin
+      final user = await ApiService.getCurrentUser();
+      if (user?.role != AppConstants.providerRole) {
+        throw Exception('Only admin can update activities');
+      }
+
       final updatedActivity =
           await ActivityService.updateActivity(id, activityData);
       final index = _activities.indexWhere((a) => a.id == id);
@@ -66,6 +74,12 @@ class ActivityProvider with ChangeNotifier {
   // Delete activity
   Future<void> deleteActivity(int id) async {
     try {
+      // Check if user is admin
+      final user = await ApiService.getCurrentUser();
+      if (user?.role != AppConstants.providerRole) {
+        throw Exception('Only admin can delete activities');
+      }
+
       await ActivityService.deleteActivity(id);
       _activities.removeWhere((a) => a.id == id);
       _filteredActivities = _activities;

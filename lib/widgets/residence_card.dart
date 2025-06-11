@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/residence_model.dart';
 import '../screens/residence_detail_screen.dart';
+import '../providers/auth_provider.dart';
+import '../utils/constants.dart';
 
 class ResidenceCard extends StatelessWidget {
   final Residence residence;
@@ -151,24 +154,32 @@ class ResidenceCard extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton.icon(
-                        onPressed: onEdit,
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Edit'),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        onPressed: onDelete,
-                        icon: const Icon(Icons.delete),
-                        label: const Text('Delete'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.red,
-                        ),
-                      ),
-                    ],
+                  // Only show edit and delete buttons for admin users
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      if (authProvider.user?.role == AppConstants.providerRole) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton.icon(
+                              onPressed: onEdit,
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Edit'),
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton.icon(
+                              onPressed: onDelete,
+                              icon: const Icon(Icons.delete),
+                              label: const Text('Delete'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ],
               ),

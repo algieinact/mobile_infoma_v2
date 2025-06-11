@@ -38,13 +38,17 @@ class ResidenceService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body)['data'];
-        return Residence.fromJson(data);
+        final responseData = jsonDecode(response.body);
+        if (responseData['data'] == null ||
+            responseData['data']['residence'] == null) {
+          throw Exception('Residence data is null in the response');
+        }
+        return Residence.fromJson(responseData['data']['residence']);
       } else {
-        throw Exception('Failed to load residence');
+        throw Exception('Failed to load residence: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      throw Exception('Error loading residence: $e');
     }
   }
 
