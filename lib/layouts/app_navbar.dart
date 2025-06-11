@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../residence_list_screen.dart';
+import 'package:mobile_infoma_v2/screens/residence_list_screen.dart';
+import '../screens/residence_list_screen.dart';
 import '../activities_screen.dart';
 import '../booking_list_screen.dart';
 import '../screens/home_screen.dart';

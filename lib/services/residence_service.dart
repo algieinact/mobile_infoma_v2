@@ -63,14 +63,30 @@ class ResidenceService {
         body: jsonEncode(residenceData),
       );
 
+      final responseData = jsonDecode(response.body);
+
       if (response.statusCode == 201) {
-        final data = jsonDecode(response.body)['data'];
-        return Residence.fromJson(data);
+        if (responseData['data'] == null) {
+          throw Exception('Residence data is null in the response');
+        }
+        return Residence.fromJson(responseData['data']);
+      } else if (response.statusCode == 422) {
+        // Handle validation errors
+        if (responseData['errors'] != null) {
+          final errors = responseData['errors'] as Map<String, dynamic>;
+          final errorMessages =
+              errors.values.expand((e) => e is List ? e : [e]).join('\n');
+          throw Exception('Validation error: $errorMessages');
+        }
+        throw Exception(
+            'Validation error: ${responseData['message'] ?? 'Unknown error'}');
       } else {
-        throw Exception('Failed to create residence');
+        throw Exception(
+            'Failed to create residence: ${response.statusCode} - ${responseData['message'] ?? 'Unknown error'}');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      if (e is Exception) rethrow;
+      throw Exception('Error creating residence: $e');
     }
   }
 
@@ -88,14 +104,30 @@ class ResidenceService {
         body: jsonEncode(residenceData),
       );
 
+      final responseData = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body)['data'];
-        return Residence.fromJson(data);
+        if (responseData['data'] == null) {
+          throw Exception('Residence data is null in the response');
+        }
+        return Residence.fromJson(responseData['data']);
+      } else if (response.statusCode == 422) {
+        // Handle validation errors
+        if (responseData['errors'] != null) {
+          final errors = responseData['errors'] as Map<String, dynamic>;
+          final errorMessages =
+              errors.values.expand((e) => e is List ? e : [e]).join('\n');
+          throw Exception('Validation error: $errorMessages');
+        }
+        throw Exception(
+            'Validation error: ${responseData['message'] ?? 'Unknown error'}');
       } else {
-        throw Exception('Failed to update residence');
+        throw Exception(
+            'Failed to update residence: ${response.statusCode} - ${responseData['message'] ?? 'Unknown error'}');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      if (e is Exception) rethrow;
+      throw Exception('Error updating residence: $e');
     }
   }
 
@@ -109,9 +141,15 @@ class ResidenceService {
         headers: await ApiService.getHeaders(),
       );
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            'Failed to delete residence: ${response.statusCode} - ${response.body}');
+      }
     } catch (e) {
-      throw Exception('Error: $e');
+      if (e is Exception) rethrow;
+      throw Exception('Error deleting residence: $e');
     }
   }
 

@@ -21,6 +21,8 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
   final _provinceController = TextEditingController();
   final _priceController = TextEditingController();
   final _capacityController = TextEditingController();
+  final _facilitiesController = TextEditingController();
+  final _rulesController = TextEditingController();
   String _type = 'kost';
   String _gender = 'all';
   bool _isLoading = false;
@@ -38,6 +40,8 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
       _capacityController.text = widget.residence!.totalRooms.toString();
       _type = widget.residence!.type;
       _gender = widget.residence!.genderType;
+      _facilitiesController.text = widget.residence!.facilities.join(', ');
+      _rulesController.text = widget.residence!.rules.join(', ');
     }
   }
 
@@ -50,6 +54,8 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
     _provinceController.dispose();
     _priceController.dispose();
     _capacityController.dispose();
+    _facilitiesController.dispose();
+    _rulesController.dispose();
     super.dispose();
   }
 
@@ -59,21 +65,59 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final residenceData = {
-        'name': _nameController.text,
-        'description': _descriptionController.text,
-        'address': _addressController.text,
-        'city': _cityController.text,
-        'province': _provinceController.text,
-        'price': double.parse(_priceController.text),
-        'capacity': int.parse(_capacityController.text),
-        'type': _type,
-        'gender': _gender,
-      };
+      Map<String, dynamic> residenceData;
 
       if (widget.residence == null) {
+        // Creating new residence
+        residenceData = {
+          'title': _nameController.text,
+          'description': _descriptionController.text,
+          'address': _addressController.text,
+          'city': _cityController.text,
+          'province': _provinceController.text,
+          'price': double.parse(_priceController.text),
+          'total_rooms': int.parse(_capacityController.text),
+          'type': _type,
+          'gender_type': _gender,
+          'price_period': 'monthly', // Assuming a default
+          'facilities': _facilitiesController.text
+              .split(',')
+              .map((e) => e.trim())
+              .toList(),
+          'rules':
+              _rulesController.text.split(',').map((e) => e.trim()).toList(),
+          'available_rooms': int.parse(_capacityController
+              .text), // Assuming available_rooms = total_rooms
+          'category_id':
+              1, // Assuming a default category ID. This might need to be a selectable field later.
+        };
+        print('Sending create data: $residenceData');
         await context.read<ResidenceProvider>().createResidence(residenceData);
       } else {
+        // Updating existing residence
+        residenceData =
+            widget.residence!.toJson(); // Start with all existing data
+
+        // Override with form values
+        residenceData['title'] = _nameController.text;
+        residenceData['description'] = _descriptionController.text;
+        residenceData['address'] = _addressController.text;
+        residenceData['city'] = _cityController.text;
+        residenceData['province'] = _provinceController.text;
+        residenceData['price'] = double.parse(_priceController.text);
+        residenceData['total_rooms'] = int.parse(_capacityController.text);
+        residenceData['type'] = _type;
+        residenceData['gender_type'] = _gender;
+        residenceData['facilities'] =
+            _facilitiesController.text.split(',').map((e) => e.trim()).toList();
+        residenceData['rules'] =
+            _rulesController.text.split(',').map((e) => e.trim()).toList();
+
+        // Update updated_at field
+        residenceData['updated_at'] = DateTime.now().toIso8601String();
+
+        print('Sending update data: $residenceData');
+
         await context.read<ResidenceProvider>().updateResidence(
               widget.residence!.id,
               residenceData,
@@ -224,6 +268,36 @@ class _ResidenceFormScreenState extends State<ResidenceFormScreen> {
                 }
                 if (int.tryParse(value) == null) {
                   return 'Please enter a valid number';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _facilitiesController,
+              decoration: const InputDecoration(
+                labelText: 'Facilities (comma-separated)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter facilities';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _rulesController,
+              decoration: const InputDecoration(
+                labelText: 'Rules (comma-separated)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter rules';
                 }
                 return null;
               },

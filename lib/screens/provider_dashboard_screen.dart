@@ -178,6 +178,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen>
                       backgroundColor: Colors.green,
                     ),
                   );
+                  context.read<ResidenceProvider>().loadResidences();
                 }
               } catch (e) {
                 if (mounted) {
